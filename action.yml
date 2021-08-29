@@ -35,5 +35,5 @@ runs:
         sudo apt update
         sudo apt install -y devscripts
         sudo apt install -y reprepro
-        scripts/build-deb-repo.sh ${{ inputs.package-model-path }} ${{ inputs.repo-root }} /tmp/reprepro ${{ inputs.repo-codename }}          
+        ${{ github.action_path }}/build-deb-repo.sh ${{ inputs.package-model-path }} ${{ inputs.repo-root }} /tmp/reprepro ${{ inputs.repo-codename }}          
       shell: bash
