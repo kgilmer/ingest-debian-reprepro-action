@@ -16,20 +16,18 @@ inputs:
   repo-codename:
     description: 'Codename to build packages with.'
     required: true
-outputs:
-  changed:
-    description: "Git has changes"
-    value: ${{ steps.git-changed.outputs.git-changes }}
+  private-key:
+    description: 'Private key contents for signing repo packages'
+    required: true
 runs:
   using: "composite"
   steps:
     - name: Configure GPG Key
       run: |
         mkdir -p ~/.gnupg/
-        printf "$GPG_SIGNING_KEY" | base64 --decode > ~/.gnupg/private.key
+        printf "${{ inputs.private-key }}" | base64 --decode > ~/.gnupg/private.key
         gpg --batch --import ~/.gnupg/private.key
-      env:
-        GPG_SIGNING_KEY: ${{ secrets.PACKAGE_PRIVATE_KEY }}
+      shell: bash
     - name: Generate Package Repository
       run: |
         export DEBEMAIL="${{ inputs.builder-email }}"
@@ -38,3 +36,4 @@ runs:
         sudo apt install -y devscripts
         sudo apt install -y reprepro
         scripts/build-deb-repo.sh ${{ inputs.package-model-path }} ${{ inputs.repo-root }} /tmp/reprepro ${{ inputs.repo-codename }}          
+      shell: bash
