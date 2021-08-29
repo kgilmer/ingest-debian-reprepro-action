@@ -1,0 +1,40 @@
+name: 'Build and Package - Debian'
+description: 'Build and package'
+inputs:
+  package-model-path:
+    description: 'Path of the package model'
+    required: true
+  repo-root:
+    description: 'Path to the root of the debian repository'
+    required: true
+  builder-email: 
+    description: 'Email address associated with repository key.'
+    required: true
+  builder-name:  
+    description: 'Name associated with repository key.'
+    required: true
+  repo-codename:
+    description: 'Codename to build packages with.'
+    required: true
+outputs:
+  changed:
+    description: "Git has changes"
+    value: ${{ steps.git-changed.outputs.git-changes }}
+runs:
+  using: "composite"
+  steps:
+    - name: Configure GPG Key
+      run: |
+        mkdir -p ~/.gnupg/
+        printf "$GPG_SIGNING_KEY" | base64 --decode > ~/.gnupg/private.key
+        gpg --batch --import ~/.gnupg/private.key
+      env:
+        GPG_SIGNING_KEY: ${{ secrets.PACKAGE_PRIVATE_KEY }}
+    - name: Generate Package Repository
+      run: |
+        export DEBEMAIL="${{ inputs.builder-email }}"
+        export DEBFULLNAME="${{ inputs.builder-name }}."
+        sudo apt update
+        sudo apt install -y devscripts
+        sudo apt install -y reprepro
+        scripts/build-deb-repo.sh ${{ inputs.package-model-path }} ${{ inputs.repo-root }} /tmp/reprepro ${{ inputs.repo-codename }}          
