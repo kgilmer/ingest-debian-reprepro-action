@@ -31,7 +31,7 @@ runs:
     - name: Generate Package Repository
       run: |
         export DEBEMAIL="${{ inputs.builder-email }}"
-        export DEBFULLNAME="${{ inputs.builder-name }}."
+        export DEBFULLNAME="${{ inputs.builder-name }}"
         sudo apt update
         sudo apt install -y devscripts
         sudo apt install -y reprepro
