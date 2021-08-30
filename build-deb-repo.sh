@@ -135,7 +135,7 @@ read_package_model() {
         done < <( jq -r ".packages.\"$package\" | to_entries | .[] | .key + \"=\" + .value" < "$PACKAGE_MODEL_FILE" )
 
         # If a package filter was specified, match filter.
-        if [[ -n "$PACKAGE_FILTER" && "$PACKAGE_FILTER" != "${packageModel[name]}" ]]; then
+        if [[ -n "$PACKAGE_FILTER" && "$PACKAGE_FILTER" != *"${packageModel[name]}"* ]]; then
             continue
         fi
 
