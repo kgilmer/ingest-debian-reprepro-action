@@ -2,11 +2,11 @@
 # This script can be used to generate Debian packages and add them to a local debian repository.
 
 # Input Parameters
-if [ "$#" -lt 4 ]; then
+if [ "$#" -lt 5 ]; then
     echo "This script builds Debian packages.  It uses a package model file that describes each package."
     echo "Each package is checked out of a git repo, source is downloaded, built, and then deployed to a PPA."
     echo "If no package name is specified from the model, all packages are built."
-    echo "Usage: build-deb-repo.sh <package model> <repo path> <temp build dir> <distribution codename> [package]"
+    echo "Usage: build-deb-repo.sh <package model> <repo path> <temp build dir> <distribution codename> <arch list> [package]"
     exit 1
 fi
 
@@ -150,8 +150,9 @@ PACKAGE_MODEL_FILE=$(realpath "$1")
 REPO_PATH=$(realpath "$2")
 BUILD_DIR=$3
 DIST_CODENAME=$4
+PKG_ARCH=$5
 # shellcheck disable=SC2034
-PACKAGE_FILTER=$5
+PACKAGE_FILTER=$6
 
 # Determine if the changelog has the correct distribution codename
 dist_valid() {
@@ -213,7 +214,6 @@ publish_deb() {
         reprepro --basedir "$REPO_PATH" include "$DIST_CODENAME" "$DEB_SRC_PKG_PATH"
     fi
 
-    PKG_ARCH="amd64,arm64,all"
     DEB_CONTROL_FILE="$BUILD_DIR/${packageModel[name]}/debian/control"
 
     for target_arch in $(echo $PKG_ARCH | sed "s/,/ /g"); do        
