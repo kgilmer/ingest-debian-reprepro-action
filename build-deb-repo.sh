@@ -151,8 +151,7 @@ REPO_PATH=$(realpath "$2")
 BUILD_DIR=$3
 DIST_CODENAME=$4
 PKG_ARCH=$5
-# shellcheck disable=SC2034
-PACKAGE_FILTER=$6
+PACKAGE_FILTER="${@:6}"
 
 # Determine if the changelog has the correct distribution codename
 dist_valid() {
